@@ -1,0 +1,21 @@
+{
+  "name": "noe-watcher",
+  "version": "1.0.0",
+  "description": "Watching for Noe fails and instabilities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "noe"
+  ],
+  "author": "Marek Czernek <mczernek@redhat.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.0",
+    "express-xml-bodyparser": "^0.3.0",
+    "mysql": "^2.16.0"
+  }
+}
