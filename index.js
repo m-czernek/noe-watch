@@ -63,15 +63,6 @@ function saveToDatabase(platform, parsedFails) {
     console.log("Connected to DB");
     var dbo = db.db("noe-db");
     const collection = dbo.collection(platform)
-   
-    // parsedFails.forEach(element => {
-    //   isAlreadyInDatabase = await collection.findOne(failInfo)
-    //   if(isAlreadyInDatabase && isAlreadyInDatabase.fail.numOfFails) {
-    //     isAlreadyInDatabase.fail.numOfFails += 1;
-    //   } else {
-    //     isAlreadyInDatabase.fail.numOfFails = 1;
-    //   }
-    // });
 
     for (failElem of parsedFails) {
       isAlreadyInDatabase = await collection.findOne(failElem)
