@@ -3,14 +3,8 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const xmlparser = require('express-xml-bodyparser')
 
-const mysql = require('mysql')
-const con = mysql.createConnection({
-  host: "localhost",
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DB,
-  insecureAuth : true
-});
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017";
 
 const app = express()
 
@@ -31,44 +25,30 @@ app.get('/', (request, response) => {
 })
 
 app.post('/api/post/parsexml', (request, response) => {
-
-  // const testResults = request.body.testsuite["$"]
-  // console.log(request.body)
-  // console.log('--------------------')
-  // console.log(testResults)
-  // console.log(testResults.failures)
-  // console.log(testResults.errors)
-  // console.log(request.body.testsuite.testcase[0].failure)
-
+  const platform = request.query.platform;
+  if(!platform) {
+    response.sendStatus(400, "Missing platform query parameter")
+  }
   // Get all tests. We should check if we have fails before getting here
   const tests = request.body.testsuite.testcase
 
-  // Get all fails; filter all else
-  const failedTests = tests.filter(function(test) {
+  // Get all fails -> Map them to an array of custom objects
+  const parsedFilteredFailedTests = tests.filter(function(test) {
     return typeof test.failure != "undefined"
-  })
+  }).map(test => (
+    {
+      classname:test['$'].classname,
+      testname: test['$'].name,
+      fail: {
+        failMsg: test.failure[0]['$'].message,
+        stackTrace: test.failure[0]['_']
+      }
+    })
+  )
 
-  console.log("found fails:", failedTests.length)
+  console.log("found fails:", parsedFilteredFailedTests.length)
+  saveToDatabase(platform, parsedFilteredFailedTests)
 
-  failedTests.forEach(failedTest => {
-    const testProperties = failedTest['$']
-    saveToDatabase({classname:testProperties.classname, 
-      testname: testProperties.name, 
-      failMsg: failedTest.failure[0]['$'].message})
-  });
-
-  //Is CLASS in DB? If so, get ID; else insert and get ID
-
-
-  // con.connect(function(err) {
-  //   if (err) throw err;
-  //   console.log("Connected!");
-  //   var sql = "INSERT INTO CLASS (FQCN) VALUES ('org.mysql.test')";
-  //   con.query(sql, function (err, result) {
-  //     if (err) throw err;
-  //     console.log("1 record inserted");
-  //   });
-  // });
   response.sendStatus(200)
 })
 /**
@@ -76,28 +56,41 @@ app.post('/api/post/parsexml', (request, response) => {
  * // TODO: MongoDB 
  * @param {*} failInfo 
  */
-function saveToDatabase(failInfo) {
-  console.log(failInfo.failMsg)
-  console.log(failInfo.classname, failInfo.testname)
-  con.connect(function(err) {
+function saveToDatabase(platform, parsedFails) {
+
+  MongoClient.connect(url, { useNewUrlParser: true }, async function(err, db) {
     if (err) throw err;
-    console.log("Connected!");
-    var selectSql = "SELECT ID FROM CLASS WHERE FQCN=?;"
-    con.query(selectSql, failInfo.classname, function (err, result, fields) {
-      if (err) throw err;
-      console.log("FIRST!", result[0]);
-    })
-
-    con.query(selectSql, "com.ex", function (err, result, fields) {
-      if (err) throw err;
-      console.log("SECOND!", result[0].ID);
-    })
-    // var insertSql = "INSERT IGNORE INTO CLASS (FQCN) VALUES ?";
-
-    // con.query(insertSql, failInfo.classname, function (err, result) {
-    //   if (err) throw err;
+    console.log("Connected to DB");
+    var dbo = db.db("noe-db");
+    const collection = dbo.collection(platform)
+   
+    // parsedFails.forEach(element => {
+    //   isAlreadyInDatabase = await collection.findOne(failInfo)
+    //   if(isAlreadyInDatabase && isAlreadyInDatabase.fail.numOfFails) {
+    //     isAlreadyInDatabase.fail.numOfFails += 1;
+    //   } else {
+    //     isAlreadyInDatabase.fail.numOfFails = 1;
+    //   }
     // });
 
-  })}
+    for (failElem of parsedFails) {
+      isAlreadyInDatabase = await collection.findOne(failElem)
+      if(!isAlreadyInDatabase) {
+        failElem.fail.numOfFails = 1
+      } else {
+        failElem = isAlreadyInDatabase
+        failElem.fail.numOfFails += 1;
+      }
+    }
+
+    console.log(parsedFails)
+    //currfail = await collection.findOne(failInfo)
+
+    //console.log(currfail)
+    
+    // dbo.collection("fails").insertOne(failInfo);
+    db.close();
+  });
+}
 
 app.listen(3000)
