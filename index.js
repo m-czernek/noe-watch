@@ -41,46 +41,59 @@ app.post('/api/post/parsexml', (request, response) => {
       testname: test['$'].name,
       fail: {
         failMsg: test.failure[0]['$'].message,
-        stackTrace: test.failure[0]['_']
+        stackTrace: test.failure[0]['_'],
+        numOfFails: 1
       }
     })
   )
 
   console.log("found fails:", parsedFilteredFailedTests.length)
-  saveToDatabase(platform, parsedFilteredFailedTests)
-
-  response.sendStatus(200)
+  saveToDatabase(platform, parsedFilteredFailedTests, (res, err) => {
+    if(err) {
+      response.sendStatus(400, res)
+    } else {
+      response.sendStatus(200, res)
+    }
+  })
 })
 /**
  * Saves parsed fails into the DB.
  * // TODO: MongoDB 
  * @param {*} failInfo 
  */
-function saveToDatabase(platform, parsedFails) {
+function saveToDatabase(platform, parsedFails, callback) {
 
   MongoClient.connect(url, { useNewUrlParser: true }, async function(err, db) {
-    if (err) throw err;
+    if (err) {
+      callback(err, true)
+      return;
+    };
     console.log("Connected to DB");
     var dbo = db.db("noe-db");
     const collection = dbo.collection(platform)
 
     for (failElem of parsedFails) {
-      isAlreadyInDatabase = await collection.findOne(failElem)
+      const isAlreadyInDatabase = await collection.findOne({
+        classname         : failElem.classname,
+        testname          : failElem.testname,
+        'fail.failMsg'    : failElem.fail.failMsg,
+        'fail.stackTrace' : failElem.fail.stackTrace
+      })
       if(!isAlreadyInDatabase) {
         failElem.fail.numOfFails = 1
+        await collection.insertOne(failElem).catch((err) => {
+          callback(err, true)
+          return;
+        });
       } else {
-        failElem = isAlreadyInDatabase
-        failElem.fail.numOfFails += 1;
+        await collection.updateOne(isAlreadyInDatabase, { $inc: { "fail.numOfFails": 1 } }).catch((err) => {
+          callback(err, true)
+          return;
+        })
       }
     }
-
-    console.log(parsedFails)
-    //currfail = await collection.findOne(failInfo)
-
-    //console.log(currfail)
-    
-    // dbo.collection("fails").insertOne(failInfo);
     db.close();
+    callback("OK", false)
   });
 }
 
