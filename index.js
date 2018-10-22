@@ -2,53 +2,53 @@
 
 'use strict';
 
-const path = require('path')
-const express = require('express')
-const exphbs = require('express-handlebars')
-const xmlparser = require('express-xml-bodyparser')
+const path = require('path');
+const express = require('express');
+const exphbs = require('express-handlebars');
+const xmlparser = require('express-xml-bodyparser');
 
-const databaseAccessLayer = require('./lib/failsDAL')
-const parserUtils = require('./lib/utils')
+const databaseAccessLayer = require('./lib/failsDAL');
+const parserUtils = require('./lib/utils');
 
-const app = express()
+const app = express();
 
-app.use(xmlparser())
+app.use(xmlparser());
 
 app.engine('.hbs', exphbs({
   defaultLayout: 'main',
   extname: '.hbs',
   layoutsDir: path.join(__dirname, 'views/layouts')
-}))
-app.set('view engine', '.hbs')
-app.set('views', path.join(__dirname, 'views'))
+}));
+app.set('view engine', '.hbs');
+app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', (request, response) => {
   response.render('home', {
     name: 'John'
   })
-})
+});
 
 app.post('/api/post/parsexml', (request, response) => {
-  const platform = request.query.platform.toString().trim().toLowerCase()
+  const platform = request.query.platform.toString().trim().toLowerCase();
   if(!platform) {
-    response.sendStatus(400, "Missing platform query parameter")
+    response.sendStatus(400, "Missing platform query parameter");
   }
 
   if(!parserUtils.containsFails(request.body)) {
-    console.log("Found no fails, returning")
-    response.sendStatus(200, "No fails found")
+    console.log("Found no fails, returning");
+    response.sendStatus(200, "No fails found");
   }
   
-  const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body)
-  console.log("found fails:", parsedFilteredFailedTests.length)
+  const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body);
+  console.log("found fails:", parsedFilteredFailedTests.length);
 
   databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests, (res, err) => {
     if(err) {
-      response.sendStatus(400, res)
+      response.sendStatus(400, res);
     } else {
-      response.sendStatus(200, res)
+      response.sendStatus(200, res);
     }
   })
 })
 
-app.listen(3000)
+app.listen(3000);
