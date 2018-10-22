@@ -12,6 +12,9 @@ const parserUtils = require('./lib/utils');
 
 const app = express();
 
+// Use custom CSS in the public directory
+app.use(express.static(__dirname + '/public'));
+
 app.use(xmlparser());
 
 app.engine('.hbs', exphbs({
