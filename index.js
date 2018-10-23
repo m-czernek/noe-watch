@@ -26,9 +26,12 @@ app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', (request, response) => {
-  response.render('home', {
-    name: 'John'
-  })
+  databaseAccessLayer.getFails().then((res) => {
+    response.render('home', {
+      // TODO: no hardcoding here
+      failArray: res['windows']
+    });
+  });
 });
 
 app.post('/api/post/parsexml', (request, response) => {
@@ -42,7 +45,7 @@ app.post('/api/post/parsexml', (request, response) => {
     response.sendStatus(200, "No fails found");
   }
   
-  const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body);
+  const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body, platform);
   console.log("found fails:", parsedFilteredFailedTests.length);
 
   databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests, (res, err) => {
