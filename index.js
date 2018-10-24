@@ -20,16 +20,19 @@ app.use(xmlparser());
 app.engine('.hbs', exphbs({
   defaultLayout: 'main',
   extname: '.hbs',
-  layoutsDir: path.join(__dirname, 'views/layouts')
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials/')
 }));
+
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', (request, response) => {
   databaseAccessLayer.getFails().then((res) => {
     response.render('home', {
-      // TODO: no hardcoding here
-      failArray: res['windows']
+      winArray: res['windows'],
+      rhelArray: res['rhel'],
+      solArray: res['sol']
     });
   });
 });

@@ -4,24 +4,28 @@
         <h1><b>NOE Watcher</b> for all platforms</h1>
       </div>
     </div>
-  <table class="container">
-    <thead>
+  <table class="table table-striped table-hover ">
+    <thead class="thead-light">
       <tr>
         <th><h1>FQCN</h1></th>
-        <th><h1>Test</h1></th>
+        <th><h1>Fail message</h1></th>
         <th><h1># Of Fails</h1></th>
         <th><h1>Stacktrace</h1></th>
       </tr>
     </thead>
     <tbody>
-      {{#each failArray}}
-        <tr>
-          <td>{{this.classname}}</td>
-          <td>{{this.testname}}</td>
-          <td>{{this.fail.numOfFails}}</td>
-          <td>TODO</td>
-        </tr>
-      {{/each}}
+      <tr class="warning">
+        <td colspan="4"><h2>RHEL</h2></td>
+      </tr>
+      {{> table rhelArray}}
+      <tr class="warning">
+        <td colspan="4"><h2>Windows</h2></td>
+      </tr>
+      {{> table winArray}}
+      <tr class="warning">
+        <td colspan="4"><h2>Solaris</h2></td>
+      </tr>
+      {{> table solArray}}
     </tbody>
   </table>   
 </div>
