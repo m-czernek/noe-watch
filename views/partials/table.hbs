@@ -3,9 +3,9 @@
         <td>{{this.classname}}.{{this.testname}}()</td>
         <td>{{this.fail.failMsg}}</td>
         <td>{{this.fail.numOfFails}}</td>
-        <td class="stacktrace"> <span class="stacktrace badge badge-secondary">TODO</span> </td>
+        <td class="stacktrace"> <span class="stacktrace badge badge-secondary">Show stack trace</span> </td>
     </tr>
-    <tr style="display:none;">
+    <tr class="animate" style="display:none;">
         <td colspan="4">{{this.fail.stackTrace}}</td>
     </tr>
 {{/each}}
