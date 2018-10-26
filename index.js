@@ -38,6 +38,10 @@ app.get('/', (request, response) => {
   });
 });
 
+app.get('/readinessProbe', (request, response) => {
+  response.sendStatus(200);
+})
+
 app.post('/api/post/parsexml', (request, response) => {
   const platform = request.query.platform.toString().trim().toLowerCase();
   if(!platform) {

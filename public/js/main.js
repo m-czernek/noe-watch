@@ -7,12 +7,12 @@ $(document).click(function(event) {
     }
     
     if(_class !== undefined && _class.includes('js_triggerable')) {
-        const _trParrent = $(event.target).parent().parent();
-        if(hide) {
-            $(_trParrent).nextUntil('.warning').css('display', 'none');
+        const _trParent = $(event.target).parent().parent();
+        if (hide) {
+            $(_trParent).nextUntil('.warning').css('display', 'none');
             hide = !hide;
         } else {
-            $(_trParrent).nextUntil('.warning').css('display', 'table-row')
+            $(_trParent).nextUntil('.warning').css('display', 'table-row')
             hide = !hide;
         }
     }
