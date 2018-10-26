@@ -9,6 +9,7 @@ const xmlparser = require('express-xml-bodyparser');
 
 const databaseAccessLayer = require('./lib/failsDAL');
 const parserUtils = require('./lib/utils');
+const _const = require('./lib/constants')
 
 const app = express();
 
@@ -30,9 +31,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.get('/', (request, response) => {
   databaseAccessLayer.getFails().then((res) => {
     response.render('home', {
-      winArray: res['windows'],
-      rhelArray: res['rhel'],
-      solArray: res['sol']
+      winArray: res[_const.WIN],
+      rhelArray: res[_const.RHEL],
+      solArray: res[_const.SOL]
     });
   });
 });
