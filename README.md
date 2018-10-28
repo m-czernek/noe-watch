@@ -100,7 +100,7 @@ At this point, you can either:
 
 ```
 $ oc new-app noe-watch-template \
-    -e STORAGE_CLASS_NAME=nfs4
+    -e STORAGE_CLASS_NAME=nfs4 \
     -e APPLICATION_HOSTNAME=www.noe-watch.com
 ```
 
