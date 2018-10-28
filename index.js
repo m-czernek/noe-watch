@@ -43,14 +43,17 @@ app.get('/readinessProbe', (request, response) => {
 })
 
 app.post('/api/post/parsexml', (request, response) => {
-  const platform = request.query.platform.toString().trim().toLowerCase();
-  if(!platform) {
-    response.sendStatus(400, "Missing platform query parameter");
+  // Check for missing body and platform
+  if(!request.query.platform || Object.getOwnPropertyNames(request.body).length === 0) {
+    response.send("Missing payload or query parameter").status(400);
+    return;
   }
+  const platform = request.query.platform.toString().trim().toLowerCase();
 
   if(!parserUtils.containsFails(request.body)) {
     console.log("Found no fails, returning");
-    response.sendStatus(200, "No fails found");
+    response.send("No fails found").status(200);
+    return;
   }
   
   const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body, platform);
@@ -58,11 +61,11 @@ app.post('/api/post/parsexml', (request, response) => {
 
   databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests, (res, err) => {
     if(err) {
-      response.sendStatus(400, res);
+      response.send(res).status(400);
     } else {
-      response.sendStatus(200, res);
+      response.sendStatus(200);
     }
-  })
+  });
 })
 
 app.listen(3000);
