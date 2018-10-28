@@ -19,9 +19,9 @@ separately as well, provided you supply a MongoDB connection URL.
 
 There are three endpoints avaiable for usage:
 
-__GET /readinessProbe__: Returns __200 OK__. This is to check whether the NodeJS server is working, regardless of the database connection
-__GET /__: If there is a successful DB connection, this renders the number of failures for each platform.
-__POST /api/post/parsexml__: Use this endpoint for uploading the results of your tests.
+* __GET /readinessProbe__: Returns __200 OK__. This is to check whether the NodeJS server is working, regardless of the database connection
+* __GET /__: If there is a successful DB connection, this renders the number of failures for each platform.
+* __POST /api/post/parsexml__: Use this endpoint for uploading the results of your tests.
 
 Noe Watch expects a JUnit XML to be uploaded as a payload in a POST request. For example:
 
