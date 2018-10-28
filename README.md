@@ -51,7 +51,7 @@ To run Noe Watch, you need:
 
 * `npm`
 * `node`
-* `oc` if you deploy on OpenShift. Note you can get a free [OpenShift account](https://openshift.io/).
+* `oc` if you deploy on OpenShift. Note that you can get a free [OpenShift account](https://openshift.io/).
 
 Check that you have them installed by issuing:
 
