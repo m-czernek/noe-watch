@@ -50,9 +50,9 @@ app.post('/api/post/parsexml', (request, response) => {
   }
   const platform = request.query.platform.toString().trim().toLowerCase();
 
-  if(!parserUtils.containsFails(request.body)) {
-    console.log("Found no fails, returning");
-    response.send("No fails found").status(200);
+  if(!parserUtils.containsFailsOrErrors(request.body)) {
+    console.log("Found no fails nor errors, returning");
+    response.send("No fails or errors found").status(200);
     return;
   }
   
