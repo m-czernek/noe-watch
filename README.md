@@ -71,8 +71,8 @@ features: Basic-Auth GSSAPI Kerberos SPNEGO
 
 To run Noe Watch locally:
 
-1. Compile SCSS into CSS: `npm run build-scss`
 1. Install dependencies: `npm install`
+1. Compile SCSS into CSS: `npm run build-scss`
 1. Run Noe: `npm start`
 
 This will execute dev setup, where NodeJS is automatically restarted after each change to the
