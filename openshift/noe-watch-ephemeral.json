@@ -1,0 +1,356 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "message": "You have deployed Noe Watcher with MongoDB as a backend.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/m-czernek/noe-watch/blob/master/README.md.",
+  "metadata": {
+    "name": "noe-watch-template-ephemeral",
+    "annotations": {
+      "description": "This template defines resources needed to deploy Noe Watch from source, including a build configuration, application deployment configuration, and database deployment configuration.",
+      "iconClass": "icon-nodejs",
+      "openshift.io/display-name": "Noe-Watch and MongoDB (Ephemeral)",
+      "openshift.io/documentation-url": "https://github.com/m-czernek/noe-watch",
+      "openshift.io/long-description": "This template defines resources needed to deploy Noe Watch from source, including a build configuration, application deployment configuration, and database deployment configuration.",
+      "tags": "quickstart,nodejs,noe"
+    }
+  },
+  "parameters": [
+    {
+      "description": "The name for the application.",
+      "name": "APPLICATION_NAME",
+      "value": "noe-watch"
+    },
+    {
+      "description": "Git source URI for application",
+      "name": "GIT_URI",
+      "value": "https://github.com/m-czernek/noe-watch.git"
+    },
+    {
+      "description": "Git branch/tag reference",
+      "name": "GIT_REF",
+      "value": "master"
+    },
+    {
+      "description": "Database name",
+      "name": "MONGODB_DATABASE",
+      "value": "noe-db"
+    },
+    {
+      "description": "Database user name",
+      "name": "MONGODB_USER",
+      "from": "user[a-zA-Z0-9]{3}",
+      "generate": "expression"
+    },
+    {
+      "description": "Database user password",
+      "name": "MONGODB_PASSWORD",
+      "from": "[a-zA-Z0-9]{5}",
+      "generate": "expression"
+    },
+    {
+      "description": "Database admin password (username admin)",
+      "name": "MONGODB_ADMIN_PASSWORD",
+      "from": "[a-zA-Z0-9]{5}",
+      "generate": "expression"
+    },
+    {
+      "description": "Hostname on which the service is available",
+      "name": "APPLICATION_HOSTNAME",
+      "required": true
+    }
+  ],
+  "labels" : {
+    "application": "noe-watch"
+  },
+  "objects" : [
+    {
+       "kind": "BuildConfig",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}"
+       },
+       "spec": {
+          "source": {
+             "type": "Git",
+             "git": {
+                "uri": "${GIT_URI}",
+                "ref": "${GIT_REF}"
+             }
+          },
+          "strategy": {
+             "type": "Source",
+             "sourceStrategy": {
+                "from": {
+                   "kind": "ImageStreamTag",
+                   "namespace": "openshift",
+                   "name": "nodejs:latest"
+                }
+             }
+          },
+          "output": {
+             "to": {
+                "kind": "ImageStreamTag",
+                "name": "${APPLICATION_NAME}:latest"
+             }
+          },
+          "triggers": [
+            {
+              "type": "ImageChange",
+              "imageChange": {}
+            }
+          ]
+       }
+    },
+
+    {
+       "kind": "ImageStream",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}"
+       }
+    },
+
+    {
+       "kind": "DeploymentConfig",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}",
+          "labels": {
+             "deploymentConfig": "${APPLICATION_NAME}"
+          }
+       },
+       "spec": {
+          "replicas": 1,
+          "selector": {
+             "deploymentConfig": "${APPLICATION_NAME}"
+          },
+          "strategy": {
+             "type": "Recreate"
+          },
+          "template": {
+             "metadata": {
+                "labels": {
+                   "deploymentConfig": "${APPLICATION_NAME}"
+                 },
+                "name": "${APPLICATION_NAME}"
+             },
+             "spec": {
+                "containers": [
+                   {
+                      "name": "${APPLICATION_NAME}",
+                      "image": "${APPLICATION_NAME}",
+                      "imagePullPolicy": "Always",
+                      "env": [
+                          {
+                            "name": "DB_USERNAME",
+                            "value": "${MONGODB_USER}"
+                         },
+                         {
+                            "name": "DB_PASSWORD",
+                            "value": "${MONGODB_PASSWORD}"
+                         },
+                         {
+                            "name": "DB_NAME",
+                            "value": "${MONGODB_DATABASE}"
+                         },
+                         {
+                           "name": "DB_ADMIN_PW",
+                           "value": "${MONGODB_ADMIN_PASSWORD}"
+                         }
+                      ],
+                      "ports": [
+                         {
+                            "name": "${APPLICATION_NAME}-http",
+                            "containerPort": 3000,
+                            "protocol": "TCP"
+                         }
+                      ],
+                      "resources": {},
+                      "securityContext": {
+                         "capabilities": {},
+                         "privileged": false
+                      }
+                   }
+                ],
+                "restartPolicy": "Always",
+                "dnsPolicy": "ClusterFirst"
+             }
+          },
+          "triggers": [
+             {
+                "type": "ImageChange",
+                "imageChangeParams": {
+                   "automatic": true,
+                   "containerNames": [
+                      "${APPLICATION_NAME}"
+                   ],
+                   "from": {
+                      "kind": "ImageStreamTag",
+                      "name": "${APPLICATION_NAME}:latest"
+                   }
+                }
+             },
+             {
+                "type": "ConfigChange"
+             }
+          ]
+       }
+    },
+
+    {
+       "kind": "DeploymentConfig",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}-mongodb"
+       },
+       "spec": {
+          "replicas": 1,
+          "selector": {
+             "deploymentConfig": "${APPLICATION_NAME}-mongodb"
+          },
+          "strategy": {
+             "type": "Recreate"
+          },
+          "template": {
+             "metadata": {
+                "labels": {
+                   "deploymentConfig": "${APPLICATION_NAME}-mongodb"
+                },
+                "name": "${APPLICATION_NAME}-mongodb"
+             },
+             "spec": {
+                "containers": [
+                   {
+                      "name": "${APPLICATION_NAME}-mongodb",
+                      "image": "mongodb",
+                      "imagePullPolicy": "IfNotPresent",
+                      "env": [
+                          {
+                            "name": "MONGODB_ADMIN_PASSWORD",
+                            "value": "${MONGODB_ADMIN_PASSWORD}"
+                          },
+                         {
+                            "name": "MONGODB_USER",
+                            "value": "${MONGODB_USER}"
+                         },
+                         {
+                            "name": "MONGODB_PASSWORD",
+                            "value": "${MONGODB_PASSWORD}"
+                         },
+                         {
+                            "name": "MONGODB_DATABASE",
+                            "value": "${MONGODB_DATABASE}"
+                         }
+
+                      ],
+                      "ports": [
+                         {
+                            "containerPort": 27017,
+                            "protocol": "TCP"
+                         }
+                      ],
+                      "resources": {},
+                      "volumeMounts": [
+                         {
+                            "name": "${APPLICATION_NAME}-mongodb-data",
+                            "mountPath": "/var/lib/mongodb/data"
+                         }
+                      ],
+                      "terminationMessagePath": "/dev/termination-log",
+                      "securityContext": {
+                         "capabilities": {},
+                         "privileged": false
+                      }
+                   }
+                ],
+                "volumes": [
+                   {
+                      "name": "${APPLICATION_NAME}-mongodb-data",
+                      "emptyDir": {}
+                   }
+                ],
+                "restartPolicy": "Always",
+                "dnsPolicy": "ClusterFirst"
+             }
+          },
+          "triggers": [
+             {
+                "type": "ImageChange",
+                "imageChangeParams": {
+                   "automatic": true,
+                   "containerNames": [
+                      "${APPLICATION_NAME}-mongodb"
+                   ],
+                   "from": {
+                      "kind": "ImageStreamTag",
+                      "namespace": "openshift",
+                      "name": "mongodb:latest"
+                   }
+                }
+             },
+             {
+                "type": "ConfigChange"
+             }
+          ]
+       }
+    },
+
+    {
+       "kind": "Service",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "mongodb"
+       },
+       "spec": {
+          "ports": [
+             {
+                "port": 27017,
+                "targetPort": 27017
+             }
+          ],
+          "selector": {
+             "deploymentConfig": "${APPLICATION_NAME}-mongodb"
+          }
+       }
+    },
+
+    {
+       "kind": "Service",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}-http",
+          "annotations": {
+             "description": "The web server's http port"
+          }
+       },
+       "spec": {
+          "ports": [
+             {
+                "port": 3000,
+                "targetPort": 3000
+             }
+          ],
+          "selector": {
+             "deploymentConfig": "${APPLICATION_NAME}"
+          }
+       }
+    },
+
+    {
+       "kind": "Route",
+       "apiVersion": "v1",
+       "metadata": {
+          "name": "${APPLICATION_NAME}-http-route",
+          "annotations": {
+             "description": "Route for application's http service"
+          }
+       },
+       "spec": {
+          "host": "${APPLICATION_HOSTNAME}",
+          "to": {
+             "kind": "Service",
+             "name": "${APPLICATION_NAME}-http"
+          }
+       }
+    }
+  ]
+}
