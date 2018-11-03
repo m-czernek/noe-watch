@@ -40,7 +40,7 @@ app.get('/', (request, response) => {
 
 app.get('/readinessProbe', (request, response) => {
   response.sendStatus(200);
-})
+});
 
 app.post('/api/post/parsexml', (request, response) => {
   // Check for missing body and platform
@@ -55,17 +55,17 @@ app.post('/api/post/parsexml', (request, response) => {
     response.send("No fails or errors found").status(200);
     return;
   }
-  
+
   const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body, platform);
   console.log("found fails:", parsedFilteredFailedTests.length);
 
-  databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests, (res, err) => {
-    if(err) {
-      response.send(res).status(400);
-    } else {
+  databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests)
+    .then(() => {
       response.sendStatus(200);
-    }
-  });
-})
+    })
+    .catch((err) => {
+      response.send("Error:" + err).status(500);
+    });
+});
 
 app.listen(3000);
