@@ -59,9 +59,13 @@ app.post('/api/post/parsexml', (request, response) => {
   const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body, platform);
   console.log("found fails:", parsedFilteredFailedTests.length);
 
-  databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests).then(() => {
-    response.sendStatus(200);
-  });
+  databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests)
+    .then(() => {
+      response.sendStatus(200);
+    })
+    .catch((err) => {
+      response.send("Error:" + err).status(500);
+    });
 });
 
 app.listen(3000);
