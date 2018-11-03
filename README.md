@@ -51,15 +51,19 @@ To run Noe Watch, you need:
 
 * `npm`
 * `node`
+
+Alternatively, those can be replaced by:
+
 * `oc` if you deploy on OpenShift. Note that you can get a free [OpenShift account](https://openshift.io/).
 
 Check that you have them installed by issuing:
 
-```
+```shell
 $ npm -v
 6.4.1
 $ node -v
 v10.12.0
+# Alternatively:
 $ oc version
 oc v3.9.0
 kubernetes v1.9.1+cbc5b49
