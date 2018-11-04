@@ -6,6 +6,7 @@ const path = require('path');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const xmlparser = require('express-xml-bodyparser');
+const favicon = require('serve-favicon');
 
 const databaseAccessLayer = require('./lib/failsDAL');
 const parserUtils = require('./lib/utils');
@@ -16,6 +17,10 @@ const app = express();
 // Use custom CSS in the public directory
 app.use(express.static(__dirname + '/public'));
 
+// Use favicon 
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
+
+// Use XML as a payload in our POST requests
 app.use(xmlparser());
 
 app.engine('.hbs', exphbs({
