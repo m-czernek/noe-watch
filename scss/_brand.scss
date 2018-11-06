@@ -1,0 +1,28 @@
+.navbar-brand {
+    &:hover {
+        path{
+            fill: $brandOnHoverGray;
+        }
+    }
+
+    .icon-text-holder {
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-icon {
+        height:32px; 
+        width:32px; 
+        display: inline !important;
+    }
+}
+
+.navbar {
+    .navbar-nav {
+        li {
+            a {
+                text-transform: uppercase;
+            }
+        }
+    }
+}
