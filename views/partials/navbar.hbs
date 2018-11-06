@@ -16,12 +16,11 @@
   </div>
   <div class="collapse navbar-collapse navbar-collapse-1">
     <ul class="nav navbar-nav navbar-primary">
-      <li>
-        <a href="/?foo=bar">First Link</a>
-      </li>
-      <li class="active">
-        <a href="#0">Another Link</a>
-      </li>
+      {{#each this}}
+        <li class="{{this.class}}">
+          <a href="/?project={{this.name}}">{{this.name}}</a>
+        </li>
+      {{/each}}
     </ul>
   </div>
 </nav>

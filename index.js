@@ -34,12 +34,27 @@ app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', (request, response) => {
-  databaseAccessLayer.getFails().then((res) => {
-    response.render('home', {
-      winArray: res[_const.WIN],
-      rhelArray: res[_const.RHEL],
-      solArray: res[_const.SOL]
-    });
+  var project = request.query.project
+  if(!project) {
+    // Assume default project
+    project = "jws"
+  }
+
+  databaseAccessLayer.getFails(project).then((res) => {
+    databaseAccessLayer.listDbs().then((dbArray) => {
+      dbArray.forEach(element => {
+        if(element.name === project) {
+          element.class = "active";
+        }
+      });
+      response.render('home', {
+        project: project,
+        dbArray: dbArray,
+        winArray: res[_const.WIN],
+        rhelArray: res[_const.RHEL],
+        solArray: res[_const.SOL]
+      });
+    })
   });
 });
 
@@ -53,6 +68,13 @@ app.post('/api/post/parsexml', (request, response) => {
     response.send("Missing payload or query parameter").status(400);
     return;
   }
+
+  var project = request.query.project
+  if(!project) {
+    response.send("Missing project name").status(400);
+    return;
+  }
+
   const platform = request.query.platform.toString().trim().toLowerCase();
 
   if(!parserUtils.containsFailsOrErrors(request.body)) {
@@ -64,7 +86,7 @@ app.post('/api/post/parsexml', (request, response) => {
   const parsedFilteredFailedTests = parserUtils.parseBodyXml(request.body, platform);
   console.log("found fails:", parsedFilteredFailedTests.length);
 
-  databaseAccessLayer.saveToDatabase(platform, parsedFilteredFailedTests)
+  databaseAccessLayer.saveToDatabase(project, platform, parsedFilteredFailedTests)
     .then(() => {
       response.sendStatus(200);
     })
