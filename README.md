@@ -2,6 +2,8 @@
 
 Noe Watch is a web app used for long-term tracking of failing tests in a CI/CD environment.
 
+![Example of the front-end](imgs/fe_show.png)
+
 ## Stack
 
 Noe Watch is built on top of:
@@ -26,14 +28,16 @@ There are three endpoints avaiable for usage:
 Noe Watch expects a JUnit XML to be uploaded as a payload in a POST request. For example:
 
 ```
-curl -i -H  "Content-Type: text/xml" -X POST -d @result.xml localhost:3000/api/post/parsexml?platform=solaris
+curl -i -H  "Content-Type: text/xml" -X POST -d @result.xml localhost:3000/api/post/parsexml?platform=solaris\&project=jws
 ```
 
 Where:
 
 *  __result.xml__ is a JUnit report
 * __localhost:3000__ is a hostname and port of your application
-* __platform__ is a parameter specifying for which platform are you uploading the results
+* __platform__ is a query parameter specifying for which platform are you uploading the results
+* __project__ is a query parameter specifying for which project you are uploading the results. If the project does not exist,
+it is created.
 
 The __platform__ query parameter is required. There are three possible platform parameters:
 

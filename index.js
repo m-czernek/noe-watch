@@ -39,6 +39,7 @@ app.get('/', (request, response) => {
     // Assume default project
     project = "jws"
   }
+  project = project.toString().trim().toLowerCase();
 
   databaseAccessLayer.getFails(project).then((res) => {
     databaseAccessLayer.listDbs().then((dbArray) => {
