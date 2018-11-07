@@ -30,26 +30,9 @@
       "value": "master"
     },
     {
-      "description": "Database name",
-      "name": "MONGODB_DATABASE",
-      "value": "noe-db"
-    },
-    {
-      "description": "Database user name",
-      "name": "MONGODB_USER",
-      "from": "user[a-zA-Z0-9]{3}",
-      "generate": "expression"
-    },
-    {
-      "description": "Database user password",
-      "name": "MONGODB_PASSWORD",
-      "from": "[a-zA-Z0-9]{5}",
-      "generate": "expression"
-    },
-    {
       "description": "Database admin password (username admin)",
       "name": "MONGODB_ADMIN_PASSWORD",
-      "from": "[a-zA-Z0-9]{5}",
+      "from": "[a-zA-Z0-9]{8}",
       "generate": "expression"
     },
     {
@@ -175,19 +158,11 @@
                       "env": [
                           {
                             "name": "DB_USERNAME",
-                            "value": "${MONGODB_USER}"
+                            "value": "admin"
                          },
                          {
                             "name": "DB_PASSWORD",
-                            "value": "${MONGODB_PASSWORD}"
-                         },
-                         {
-                            "name": "DB_NAME",
-                            "value": "${MONGODB_DATABASE}"
-                         },
-                         {
-                           "name": "DB_ADMIN_PW",
-                           "value": "${MONGODB_ADMIN_PASSWORD}"
+                            "value": "${MONGODB_ADMIN_PASSWORD}"
                          }
                       ],
                       "ports": [
@@ -260,20 +235,7 @@
                           {
                             "name": "MONGODB_ADMIN_PASSWORD",
                             "value": "${MONGODB_ADMIN_PASSWORD}"
-                          },
-                         {
-                            "name": "MONGODB_USER",
-                            "value": "${MONGODB_USER}"
-                         },
-                         {
-                            "name": "MONGODB_PASSWORD",
-                            "value": "${MONGODB_PASSWORD}"
-                         },
-                         {
-                            "name": "MONGODB_DATABASE",
-                            "value": "${MONGODB_DATABASE}"
-                         }
-
+                          }
                       ],
                       "ports": [
                          {
