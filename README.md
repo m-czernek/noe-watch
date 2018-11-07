@@ -22,7 +22,7 @@ separately as well, provided you supply a MongoDB connection URL.
 There are three endpoints avaiable for usage:
 
 * __GET /readinessProbe__: Returns __200 OK__. This is to check whether the NodeJS server is working, regardless of the database connection
-* __GET /__: If there is a successful DB connection, this renders the number of failures for each platform.
+* __GET /__: If there is a successful DB connection, this renders the number of failures for each platform. 
 * __POST /api/post/parsexml__: Use this endpoint for uploading the results of your tests.
 
 Noe Watch expects a JUnit XML to be uploaded as a payload in a POST request. For example:
@@ -36,14 +36,16 @@ Where:
 *  __result.xml__ is a JUnit report
 * __localhost:3000__ is a hostname and port of your application
 * __platform__ is a query parameter specifying for which platform are you uploading the results
-* __project__ is a query parameter specifying for which project you are uploading the results. If the project does not exist,
-it is created.
+* __project__ is a query parameter specifying for which project you are uploading the results.
 
 The __platform__ query parameter is required. There are three possible platform parameters:
 
 * Windows
 * Solaris
 * RHEL
+
+The __project__ query parameter is required. If the project does not exist, it is created and appears
+with the first write of results in the __/__ endpoint.
 
 You may tweak the plaforms in the [constants.js](lib/constants.js) file.
 
