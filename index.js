@@ -16,6 +16,10 @@ const app = express();
 
 // Use custom CSS in the public directory
 app.use(express.static(__dirname + '/public'));
+// Set patternfly caching so that we do not rely on CDN
+app.use('/patternfly', express.static(__dirname + '/node_modules/patternfly/dist'))
+app.use('/jquery', express.static(__dirname + '/node_modules/jquery/dist'))
+app.use('/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'))
 
 // Use favicon 
 app.use(favicon(__dirname + '/public/images/favicon.ico'));
