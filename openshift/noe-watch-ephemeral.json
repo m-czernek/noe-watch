@@ -1,7 +1,7 @@
 {
   "kind": "Template",
   "apiVersion": "v1",
-  "message": "You have deployed Noe Watcher with MongoDB as a backend.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/m-czernek/noe-watch/blob/master/README.md.",
+  "message": "You have deployed Noe Watch with MongoDB as a backend.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/m-czernek/noe-watch/blob/master/README.md.",
   "metadata": {
     "name": "noe-watch-template-ephemeral",
     "annotations": {
